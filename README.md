@@ -15,10 +15,7 @@
 저는 핀테크를 포함한 전반적인 금융경제 산업의 거래 시장과 온라인 광고 마케팅을 주로 연구하지만,     
 여러분들 중에서 데이터애널리스트 또는 데이터싸이언티스트로 경쟁력을 갖추고 본인을 브랜딩하는데 관심있는 학생들을 모집합니다.     
 
-![Image](https://github.com/user-attachments/assets/a8ade96b-25b1-4f5b-8ab3-daa76e8b52ae)
-
 <img width="2132" height="1588" alt="Image" src="https://github.com/user-attachments/assets/68ceaa0d-2aa6-477d-8d9e-c7a5823e61c6" />
-
 <img width="2132" height="1588" alt="Image" src="https://github.com/user-attachments/assets/74f02b05-b624-4a95-8516-206825297cb5" />
 
 - `약 6개월의 스터디와 프로젝트 수련 후 정식멤버로 임명됨`
