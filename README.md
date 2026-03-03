@@ -17,6 +17,10 @@
 
 ![Image](https://github.com/user-attachments/assets/a8ade96b-25b1-4f5b-8ab3-daa76e8b52ae)
 
+<img width="2132" height="1588" alt="Image" src="https://github.com/user-attachments/assets/68ceaa0d-2aa6-477d-8d9e-c7a5823e61c6" />
+
+<img width="2132" height="1588" alt="Image" src="https://github.com/user-attachments/assets/74f02b05-b624-4a95-8516-206825297cb5" />
+
 - `약 6개월의 스터디와 프로젝트 수련 후 정식멤버로 임명됨`
 - **1기 멤버:** **손도언**, 차명주, 장민재, 임보민
 - **2기 멤버:** 박재흥, **유효정**, 조은지, 강보현, 이현서, 방가연, 이준형
