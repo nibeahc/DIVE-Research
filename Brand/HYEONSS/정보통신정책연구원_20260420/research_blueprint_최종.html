@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생성형 AI 디지털 격차 연구 분석 기획</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple-50: #EEEDFE; --purple-200: #AFA9EC; --purple-600: #534AB7; --purple-800: #3C3489;
+    --teal-50: #E1F5EE; --teal-600: #0F6E56; --teal-800: #085041;
+    --gray-600: #5F5E5A; --gray-200: #B4B2A9;
+    --text-primary: #1a1a18; --text-secondary: #5F5E5A; --text-tertiary: #888780;
+    --bg-primary: #ffffff; --bg-secondary: #F7F6F2;
+    --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+  }
+  body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg-secondary); color: var(--text-primary); line-height: 1.6; padding: 2rem 1rem; }
+  .container { max-width: 960px; margin: 0 auto; }
+
+  .report-header { background: var(--bg-primary); border: 0.5px solid var(--border); border-radius: 16px; padding: 2.5rem 2.5rem 2rem; margin-bottom: 2rem; }
+  .report-tag { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: var(--purple-600); text-transform: uppercase; margin-bottom: 10px; }
+  .report-title { font-size: 26px; font-weight: 700; line-height: 1.3; margin-bottom: 8px; }
+  .report-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 1.5rem; }
+
+  .kpi-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .kpi { background: var(--bg-secondary); border-radius: 10px; padding: 14px 16px; border: 0.5px solid var(--border); }
+  .kpi-val { font-size: 20px; font-weight: 700; }
+  .kpi-label { font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.4; }
+  .kpi-note { font-size: 9px; color: var(--text-tertiary); margin-top: 3px; font-style: italic; line-height: 1.4; }
+  .kpi-delta { font-size: 10px; color: #1D9E75; margin-top: 2px; font-weight: 500; }
+
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; color: var(--text-tertiary); text-transform: uppercase; margin: 2rem 0 1rem; padding-bottom: 8px; border-bottom: 0.5px solid var(--border); }
+
+  .card { background: var(--bg-primary); border-radius: 14px; border: 0.5px solid var(--border); margin-bottom: 1.5rem; overflow: hidden; }
+  .card-header { padding: 1.25rem 1.75rem 1rem; border-bottom: 0.5px solid var(--border); display: flex; gap: 14px; align-items: flex-start; }
+  .card-icon { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; margin-top: 2px; }
+  .icon-y { background: var(--purple-50); color: var(--purple-600); }
+  .icon-x { background: var(--teal-50); color: var(--teal-600); }
+  .card-title { font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .card-sub { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+  .card-body { padding: 1.5rem 1.75rem; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .stat-box { background: var(--bg-secondary); border-radius: 8px; padding: 10px 12px; }
+  .stat-val { font-size: 18px; font-weight: 700; }
+  .stat-lbl { font-size: 10px; color: var(--text-secondary); margin-top: 2px; line-height: 1.4; }
+  .stat-how { font-size: 9px; color: var(--text-tertiary); margin-top: 4px; line-height: 1.5; font-style: italic; border-top: 0.5px solid var(--border); padding-top: 4px; }
+  .c-purple { color: var(--purple-600); }
+  .c-teal   { color: var(--teal-600); }
+  .c-gray   { color: var(--gray-600); }
+
+  .dv-box { background: var(--purple-50); border-radius: 10px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; border: 1px solid var(--purple-200); }
+  .dv-title { font-size: 12px; font-weight: 700; color: var(--purple-800); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .dv-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .dv-step-num { width: 20px; height: 20px; border-radius: 50%; background: var(--purple-600); color: white; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .dv-step-text { font-size: 12px; color: var(--text-secondary); line-height: 1.7; }
+  .dv-step-text strong { color: var(--purple-800); }
+  .dv-result { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+  .dv-class { border-radius: 7px; padding: 8px 12px; font-size: 12px; font-weight: 600; }
+  .dv-class-1 { background: var(--purple-600); color: white; }
+  .dv-class-0 { background: white; color: var(--text-secondary); border: 1px solid var(--border-strong); }
+  .dv-class-n { font-size: 10px; font-weight: 400; margin-top: 3px; opacity: 0.85; line-height: 1.4; }
+
+  .finding-box { background: var(--purple-50); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--purple-800); line-height: 1.7; margin-bottom: 1rem; border-left: 3px solid var(--purple-600); }
+  .finding-box strong { font-weight: 700; }
+
+  .insight-box { background: var(--bg-secondary); border-radius: 8px; padding: 10px 13px; font-size: 11.5px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+  .insight-box strong { color: var(--text-primary); font-weight: 600; }
+
+  .var-section { margin-bottom: 1.25rem; }
+  .var-group-title { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; padding: 5px 0; border-bottom: 0.5px solid var(--border); display: flex; align-items: center; gap: 6px; }
+  .var-group-badge { font-size: 9px; padding: 2px 7px; border-radius: 3px; font-weight: 600; font-family: 'DM Mono', monospace; }
+  .badge-a  { background: #E1F5EE; color: #085041; }
+  .badge-b  { background: #EEEDFE; color: #3C3489; }
+  .badge-ctrl { background: #F1EFE8; color: #444441; }
+
+  .var-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .var-item { font-size: 11px; background: var(--bg-secondary); border: 0.5px solid var(--border); border-radius: 4px; padding: 3px 8px; color: var(--text-secondary); line-height: 1.4; }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 10px; padding: 3px 8px; border-radius: 4px; border: 0.5px solid var(--border-strong); color: var(--text-secondary); font-family: 'DM Mono', monospace; }
+  .journal-tag { font-size: 10px; padding: 3px 9px; border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); border: 0.5px solid var(--border-strong); font-style: italic; }
+
+  .diagram-wrap { background: var(--bg-secondary); border-radius: 10px; padding: 1rem; border: 0.5px solid var(--border); }
+  .diagram-label { font-size: 10px; color: var(--text-tertiary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  .flow-strip { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; padding: 10px 0; }
+  .flow-box { background: var(--bg-secondary); border-radius: 6px; padding: 7px 10px; font-size: 11px; color: var(--text-primary); border: 0.5px solid var(--border); line-height: 1.5; }
+  .flow-arrow { color: var(--text-tertiary); font-size: 14px; margin-top: 8px; }
+
+  .divider { height: 0.5px; background: var(--border); margin: 1rem 0; }
+  .footer-note { text-align: center; font-size: 11px; color: var(--text-tertiary); padding: 1rem 0; margin-top: 1rem; }
+
+  @media (max-width: 640px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="report-header">
+    <div class="report-tag">Research Analysis Blueprint · SSCI Impact</div>
+    <h1 class="report-title">생성형 AI 디지털 격차 진단 및<br>포용적 UI 설계 가이드라인 구축</h1>
+    <p class="report-sub">지능정보사회 이용자 패널조사(2022·2023·2024) 마이크로데이터 기반 — XAI(SHAP·ICE) 활용 종단 전환 분석</p>
+    <div class="kpi-strip">
+      <div class="kpi">
+        <div class="kpi-val">3,427명</div>
+        <div class="kpi-label">분석 대상 (비이용자 패널)</div>
+        <div class="kpi-note">2023년 비이용자 중 2024년까지 동일인 추적 성공 인원</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">546명</div>
+        <div class="kpi-label">전환자 (이진=1)</div>
+        <div class="kpi-note">2023년 비이용 → 2024년 이용으로 전환된 동일인</div>
+        <div class="kpi-delta">전환율 15.9%</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">2,881명</div>
+        <div class="kpi-label">비전환자 (이진=0)</div>
+        <div class="kpi-note">2023·2024 모두 비이용 상태 유지 동일인</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val">11.8 → 24.8%</div>
+        <div class="kpi-label">전체 이용률 변화</div>
+        <div class="kpi-note">동일인 패널 기준 생성형 AI 이용률 추이</div>
+        <div class="kpi-delta">1년 만에 2.1배 증가</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 종속변수 -->
+  <div class="section-label">종속변수 구성</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-y">Y</div>
+      <div>
+        <div class="card-title">생성형 AI 이용 전환 여부 (이진 분류)</div>
+        <div class="card-sub">2023년 비이용자만 추출한 뒤, 2024년 이용 경험 유무를 전환 여부(0/1)로 변환</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="dv-box">
+        <div class="dv-title">종속변수 생성 절차</div>
+        <div class="dv-step">
+          <div class="dv-step-num">1</div>
+          <div class="dv-step-text">
+            <strong>2023년 생성형 AI 비이용자(q23=2)만 추출.</strong><br>
+            전체 4,581명 중 비이용자 4,038명. 이 중 2024년까지 동일인 추적 성공: 3,427명 확보.
+          </div>
+        </div>
+        <div class="dv-step">
+          <div class="dv-step-num">2</div>
+          <div class="dv-step-text">
+            <strong>동일 ID 기준으로 2024년 데이터를 merge(병합).</strong><br>
+            두 데이터셋을 ID를 기준으로 가로로 붙이는 방식. 행을 아래로 쌓는 concat이 아닌, 동일인의 다른 연도 응답을 옆에 붙이는 merge. 결과적으로 한 행에 동일인의 2023년·2024년 응답이 모두 포함된 wide 형태 구성.
+          </div>
+        </div>
+        <div class="dv-step">
+          <div class="dv-step-num">3</div>
+          <div class="dv-step-text">
+            <strong>2024년 생성형 AI 이용 경험(Q24)을 이진 변수로 변환.</strong><br>
+            Q24=1(이용 있음) → 전환=1 / Q24=2(이용 없음) → 전환=0
+          </div>
+        </div>
+        <div class="dv-result">
+          <div class="dv-class dv-class-1">
+            전환 = 1
+            <div class="dv-class-n">546명 (15.9%)<br>2024년에 처음 생성형 AI를 이용하기 시작한 사람</div>
+          </div>
+          <div class="dv-class dv-class-0">
+            비전환 = 0
+            <div class="dv-class-n">2,881명 (84.1%)<br>2024년에도 계속 비이용 상태를 유지한 사람</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-val c-purple">3.54</div>
+          <div class="stat-lbl">전환자 디지털역량 평균</div>
+          <div class="stat-how">전환자 546명에 대해 디지털역량 24개 문항(q33_1~24) 각각의 평균을 구한 뒤, 그 24개 값의 평균을 재산출한 값</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val c-gray">3.26</div>
+          <div class="stat-lbl">비전환자 디지털역량 평균</div>
+          <div class="stat-how">비전환자 2,881명에 대해 동일한 방식으로 산출. 전환자(3.54)와 비전환자(3.26)의 차이가 0.28로, 역량이 전환을 예측하는 주요 변수임을 시사</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val c-teal">±0.06</div>
+          <div class="stat-lbl">미이용 이유 최대 집단 차이</div>
+          <div class="stat-how">미이용 이유 12개 문항 각각에 대해 전환자·비전환자 평균을 구한 뒤, 두 집단 간 차이의 절댓값 중 최댓값. 장벽 인식은 전환을 거의 예측하지 못함을 의미</div>
+        </div>
+      </div>
+
+      <div class="finding-box">
+        <strong>핵심 발견 (데이터 직접 확인):</strong> 미이용 이유(장벽 인식) 12개 문항은 전환자·비전환자 간 평균 차이가 최대 ±0.062로 두 집단이 거의 동일한 반면, 지능형 서비스 이용 의도 9개 도메인은 전환자가 모든 도메인에서 일관되게 높음. 즉 <strong>"왜 안 쓰는지"는 전환을 예측 못하고, "어떤 서비스를 쓰고 싶은지"가 실제 전환을 예측한다.</strong> 이 대비를 SHAP으로 시각화하는 것이 연구의 핵심 기여.
+      </div>
+    </div>
+  </div>
+
+  <!-- 독립변수 -->
+  <div class="section-label">독립변수 구성</div>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-x">X</div>
+      <div>
+        <div class="card-title">6개 변수군 — 3개년 데이터를 ID 기준 merge하여 1개 행에 구성</div>
+        <div class="card-sub">2022년·2023년 변수를 동일인 기준으로 병합 → 머신러닝·딥러닝 모델에 동시 투입</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="two-col">
+
+        <!-- 왼쪽 컬럼 -->
+        <div>
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-a">2022년</span>
+              변수군 1 · 디지털 역량 (24개 항목)
+            </div>
+            <div class="insight-box">
+              온라인 서비스 이용, 정보 보호·권리 신고, 미디어 리터러시, 콘텐츠 제작, 시민 참여 등 5개 차원 총 24개 항목. 변수군 2(2023년)와 함께 투입하면 SHAP이 <strong>"원래부터 역량이 높았던 사람"과 "이후 역량이 성장한 사람"을 자동으로 분리</strong>해줌. 두 연도 값의 차이를 별도 파생변수(역량 변화량)로 추가하는 방안도 검토.
+            </div>
+          </div>
+
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-b">2023년</span>
+              변수군 2 · 디지털 역량 (24개 항목)
+            </div>
+            <div class="insight-box">
+              변수군 1과 동일한 24개 항목. 전환 직전 연도의 역량 수준 측정. 두 연도 값을 모두 모델에 투입하므로 SHAP Interaction으로 <strong>역량의 절대 수준 효과와 변화 효과를 분리 가능</strong>.
+            </div>
+          </div>
+
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-b">2023년</span>
+              변수군 3 · 지능형 서비스 이용 의도 (9개 도메인)
+            </div>
+            <div class="insight-box">
+              비이용자가 향후 AI를 쓰고 싶은 도메인(의료·금융·교육·미디어·헬스·치안·여가·소비·업무). 전환자가 비전환자보다 모든 도메인에서 일관되게 높은 점수 — <strong>SHAP 중요도 상위 예측 변수군으로 예상</strong>. 변수군 4와의 SHAP 중요도 비교가 핵심 분석.
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽 컬럼 -->
+        <div>
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-b">2023년</span>
+              변수군 4 · 생성형 AI 미이용 이유 (12개 항목)
+            </div>
+            <div class="insight-box">
+              비이용자에게만 물어본 장벽 인식(복잡성·비용·개인정보·정확성·과의존 등 12개). 전환자·비전환자 평균 차이 최대 ±0.062로 거의 동일. 모델에 포함해 <strong>SHAP 중요도가 낮게 나오는지 실증적으로 확인</strong>하는 것이 목적.
+            </div>
+          </div>
+
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-b">2023년</span>
+              변수군 5 · 기관·기업 개인정보 관리 신뢰 (13개)
+            </div>
+            <div class="insight-box">
+              금융기관·검색사이트·SNS·정부 등 13개 기관에 대한 개인정보 관리 신뢰도. 검색사이트·가상세계 플랫폼 등 AI 관련 플랫폼 신뢰가 전환 여부와 연결되는지 탐색.
+            </div>
+          </div>
+
+          <div class="var-section">
+            <div class="var-group-title">
+              <span class="var-group-badge badge-b">2023년</span>
+              변수군 6 · 인구통계 (9개 항목)
+            </div>
+            <div class="insight-box">
+              연령대·성별·직업·최종학력·혼인상태·자녀 여부·월평균 개인 소득·월평균 가구 소득·주관적 생활수준. 독립변수로 함께 투입하여 SHAP으로 인구통계적 요인이 전환에 미치는 기여도를 다른 변수군과 동등하게 비교.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 연구 모형도 -->
+  <div class="section-label">연구 모형도</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="diagram-wrap">
+        <div class="diagram-label">생성형 AI 이용 전환 예측 모형</div>
+        <svg width="100%" viewBox="0 0 860 420" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#B4B2A9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="arrg2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M1 1L9 5L1 9" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+
+          <!-- 2022년 -->
+          <text x="14" y="20" font-size="9" fill="#085041" font-weight="600" font-family="Noto Sans KR,sans-serif">2022년</text>
+          <rect x="14" y="28" width="158" height="42" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+          <text x="93" y="46" text-anchor="middle" font-size="10" font-weight="700" fill="#085041" font-family="Noto Sans KR,sans-serif">디지털 역량 (2022)</text>
+          <text x="93" y="61" text-anchor="middle" font-size="9" fill="#0F6E56" font-family="Noto Sans KR,sans-serif">24개 항목</text>
+
+          <!-- 2023년 -->
+          <text x="14" y="98" font-size="9" fill="#3C3489" font-weight="600" font-family="Noto Sans KR,sans-serif">2023년</text>
+          <rect x="14" y="106" width="158" height="42" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+          <text x="93" y="124" text-anchor="middle" font-size="10" font-weight="700" fill="#3C3489" font-family="Noto Sans KR,sans-serif">디지털 역량 (2023)</text>
+          <text x="93" y="139" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">24개 항목</text>
+
+          <rect x="14" y="160" width="158" height="42" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+          <text x="93" y="178" text-anchor="middle" font-size="10" font-weight="700" fill="#3C3489" font-family="Noto Sans KR,sans-serif">지능형 서비스 이용 의도</text>
+          <text x="93" y="193" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">9개 도메인</text>
+
+          <rect x="14" y="214" width="158" height="42" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+          <text x="93" y="232" text-anchor="middle" font-size="10" font-weight="700" fill="#3C3489" font-family="Noto Sans KR,sans-serif">생성형 AI 미이용 이유</text>
+          <text x="93" y="247" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">12개 항목</text>
+
+          <rect x="14" y="268" width="158" height="42" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+          <text x="93" y="286" text-anchor="middle" font-size="10" font-weight="700" fill="#3C3489" font-family="Noto Sans KR,sans-serif">기관 개인정보 신뢰</text>
+          <text x="93" y="301" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">13개 기관</text>
+
+          <!-- 인구통계 독립변수 -->
+          <rect x="14" y="332" width="158" height="42" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+          <text x="93" y="350" text-anchor="middle" font-size="10" font-weight="600" fill="#3C3489" font-family="Noto Sans KR,sans-serif">인구통계</text>
+          <text x="93" y="365" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">연령·성별·직업·학력·소득</text>
+
+          <!-- ML+DL 모델 박스 -->
+          <rect x="295" y="155" width="148" height="100" rx="10" fill="#F7F6F2" stroke="#534AB7" stroke-width="1.2" stroke-dasharray="5 3"/>
+          <text x="369" y="179" text-anchor="middle" font-size="10" font-weight="700" fill="#3C3489" font-family="Noto Sans KR,sans-serif">ML / DL 모델</text>
+          <text x="369" y="195" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">머신러닝 (XGBoost 등)</text>
+          <text x="369" y="210" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">딥러닝 (TabNet 등)</text>
+          <text x="369" y="225" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">5-Fold Stratified CV</text>
+          <text x="369" y="241" text-anchor="middle" font-size="9" fill="#534AB7" font-family="Noto Sans KR,sans-serif">Optuna 하이퍼파라미터</text>
+
+          <!-- 종속변수 박스 -->
+          <rect x="558" y="140" width="148" height="130" rx="10" fill="#534AB7" stroke="#3C3489" stroke-width="1.5"/>
+          <text x="632" y="168" text-anchor="middle" font-size="11" font-weight="700" fill="white" font-family="Noto Sans KR,sans-serif">생성형 AI</text>
+          <text x="632" y="186" text-anchor="middle" font-size="11" font-weight="700" fill="white" font-family="Noto Sans KR,sans-serif">이용 전환 여부</text>
+          <line x1="578" y1="200" x2="716" y2="200" stroke="rgba(255,255,255,0.3)" stroke-width="0.5"/>
+          <text x="632" y="218" text-anchor="middle" font-size="9" fill="#EEEDFE" font-family="Noto Sans KR,sans-serif">전환 = 1 (546명)</text>
+          <text x="632" y="234" text-anchor="middle" font-size="9" fill="#EEEDFE" font-family="Noto Sans KR,sans-serif">비전환 = 0 (2,881명)</text>
+          <text x="632" y="258" text-anchor="middle" font-size="8" fill="#AFA9EC" font-family="Noto Sans KR,sans-serif">분석 대상 3,427명</text>
+
+          <!-- XAI 결과 박스 -->
+          <rect x="558" y="304" width="148" height="84" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.8"/>
+          <text x="632" y="326" text-anchor="middle" font-size="9" font-weight="700" fill="#085041" font-family="Noto Sans KR,sans-serif">XAI 분석</text>
+          <text x="632" y="342" text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Noto Sans KR,sans-serif">SHAP Summary Plot</text>
+          <text x="632" y="356" text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Noto Sans KR,sans-serif">ICE Plot (전환 임계점)</text>
+          <text x="632" y="370" text-anchor="middle" font-size="8.5" fill="#0F6E56" font-family="Noto Sans KR,sans-serif">K-Means 페르소나 군집화</text>
+
+          <!-- UI 가이드라인 박스 -->
+          <rect x="754" y="314" width="90" height="64" rx="8" fill="#534AB7" stroke="#3C3489" stroke-width="1"/>
+          <text x="799" y="336" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="Noto Sans KR,sans-serif">UI 설계</text>
+          <text x="799" y="352" text-anchor="middle" font-size="9" font-weight="700" fill="white" font-family="Noto Sans KR,sans-serif">가이드라인</text>
+          <text x="799" y="368" text-anchor="middle" font-size="8" fill="#EEEDFE" font-family="Noto Sans KR,sans-serif">군집별 맞춤</text>
+
+          <!-- 독립변수 → ML 화살표 -->
+          <line x1="172" y1="49" x2="293" y2="190" stroke="#0F6E56" stroke-width="1.2" marker-end="url(#arr)"/>
+          <line x1="172" y1="127" x2="293" y2="200" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="172" y1="181" x2="293" y2="208" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arr)"/>
+          <line x1="172" y1="235" x2="293" y2="218" stroke="#534AB7" stroke-width="1" marker-end="url(#arr)"/>
+          <line x1="172" y1="289" x2="293" y2="228" stroke="#534AB7" stroke-width="1" marker-end="url(#arr)"/>
+          <line x1="172" y1="353" x2="293" y2="238" stroke="#534AB7" stroke-width="1" marker-end="url(#arr)"/>
+
+          <!-- 역량 변화량 파생변수 표시 -->
+          <text x="182" y="110" font-size="8" fill="#3C3489" font-family="Noto Sans KR,sans-serif">역량변화량(23-22)</text>
+          <text x="182" y="120" font-size="8" fill="#3C3489" font-family="Noto Sans KR,sans-serif">파생변수 추가 검토</text>
+          <line x1="180" y1="105" x2="180" y2="55" stroke="#3C3489" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+          <!-- ML → 종속변수 -->
+          <line x1="443" y1="205" x2="556" y2="205" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arr)"/>
+
+          <!-- 종속변수 → XAI -->
+          <line x1="632" y1="270" x2="632" y2="302" stroke="#534AB7" stroke-width="1.2" marker-end="url(#arr)"/>
+
+          <!-- XAI → UI -->
+          <line x1="706" y1="346" x2="752" y2="346" stroke="#0F6E56" stroke-width="1.2" marker-end="url(#arrg2)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 분석 파이프라인 -->
+  <div class="section-label">분석 파이프라인</div>
+  <div class="card">
+    <div class="card-body">
+      <div class="flow-strip">
+        <div class="flow-box">① 데이터 병합<br><span style="font-size:10px;color:#888780">3개년 ID 기준 merge<br>wide 형태 구성</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">② 대상 추출<br><span style="font-size:10px;color:#888780">비이용자만 필터<br>3,427명</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">③ 종속변수 생성<br><span style="font-size:10px;color:#888780">이용 경험 → 이진 변환<br>전환=1 / 비전환=0</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">④ ML/DL 모델 훈련<br><span style="font-size:10px;color:#888780">머신러닝·딥러닝 계열<br>Optuna 튜닝</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">⑤ SHAP 해석<br><span style="font-size:10px;color:#888780">변수 중요도<br>기여 방향 시각화</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">⑥ ICE Plot<br><span style="font-size:10px;color:#888780">개인별 이질성<br>임계점 탐색</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">⑦ 군집화<br><span style="font-size:10px;color:#888780">SHAP값 기반<br>K-Means 페르소나</span></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">⑧ UI 가이드라인<br><span style="font-size:10px;color:#888780">군집별 맞춤<br>인터페이스 설계</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="tag-row">
+        <span class="tag-filled">타겟 저널</span>
+        <span class="journal-tag">Information Systems Research</span>
+        <span class="journal-tag">MISQ</span>
+        <span class="journal-tag">Information &amp; Management</span>
+        <span class="journal-tag">Computers in Human Behavior</span>
+        <span class="journal-tag">IJHCS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">지능정보사회 이용자 패널조사 (KISDI) 2022·2023·2024 마이크로데이터 기반 분석 기획안</div>
+
+</div>
+</body>
+</html>
